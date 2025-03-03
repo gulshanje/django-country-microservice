@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: countrydb
+      POSTGRES_USER: countryuser
+      POSTGRES_PASSWORD: countrypassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  country_service:
+    build:
+      context: ./country_service
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./country_service:/usr/src/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  countrydata_service:
+    build:
+      context: ./countrydata_service
+    command: python manage.py runserver 0.0.0.0:8001
+    volumes:
+      - ./countrydata_service:/usr/src/app
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
